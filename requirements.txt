@@ -1,0 +1,6 @@
+streamlit
+pandas
+openpyxl
+requests
+icalendar
+recurring-ical-events

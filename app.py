@@ -40,7 +40,7 @@ def clean_leave_type(text):
     return re.sub(r'[\s\d]+', '', text)
 
 def fetch_google_events(url, start_range, end_range):
-    """Fetches iCal data, handles multi-day, and filters for 'AL ref'."""
+    """Fetches iCal data, handles multi-day, and filters for specific references."""
     if not url: return {}
     
     try:
@@ -87,15 +87,17 @@ def fetch_google_events(url, start_range, end_range):
                 
                 current_curr += datetime.timedelta(days=1)
         
-        # --- LOGIC UPDATE: 'AL ref' FILTER ---
+        # --- LOGIC UPDATE: MULTIPLE REF FILTER ---
         final_map = {}
+        target_refs = ["al ref", "cl ref", "vl ref"]
+        
         for date_key, summary_list in events_map.items():
-            # 1. Check if any event in the list contains "AL ref" (case insensitive)
-            al_ref_events = [s for s in summary_list if "al ref" in s.lower()]
+            # Check if any event in the list contains any of our target references
+            ref_events = [s for s in summary_list if any(ref in s.lower() for ref in target_refs)]
             
-            if al_ref_events:
+            if ref_events:
                 # If found, ONLY show these specific events
-                final_map[date_key] = "; ".join(al_ref_events)
+                final_map[date_key] = "; ".join(ref_events)
             else:
                 # Otherwise, show everything
                 final_map[date_key] = "; ".join(summary_list)
